@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morocco Travel Planner - CTM & ONCF</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #e63946;
+            --secondary-color: #1d3557;
+            --accent-color: #457b9d;
+            --light-color: #f1faee;
+            --medium-color: #a8dadc;
+            --dark-color: #0f1a2c;
+            --ctm-color: #e63946;
+            --oncf-color: #457b9d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(to bottom, var(--light-color), var(--medium-color));
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            color: var(--dark-color);
+        }
+
+        .header {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 1.5rem 0;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: bg.jpg;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.2;
+            z-index: 0;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.9;
+        }
+
+        .service-badges {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .service-badge {
+            padding: 0.4rem 1rem;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .badge-ctm {
+            background-color: var(--ctm-color);
+            color: white;
+        }
+
+        .badge-oncf {
+            background-color: var(--oncf-color);
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .search-card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-top: -3rem;
+            position: relative;
+            z-index: 10;
+            margin-bottom: 2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .search-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .search-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--accent-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(69, 123, 157, 0.2);
+        }
+
+        .input-icon {
+            position: absolute;
+            top: 2.5rem;
+            right: 1rem;
+            color: #999;
+        }
+
+        .autocomplete-container {
+            position: relative;
+        }
+
+        .autocomplete-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 0 0 8px 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .autocomplete-item {
+            padding: 0.8rem 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid #f5f5f5;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .autocomplete-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .autocomplete-item .service-tag {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .autocomplete-item .service-tag.ctm {
+            background-color: var(--ctm-color);
+            color: white;
+        }
+
+        .autocomplete-item .service-tag.oncf {
+            background-color: var(--oncf-color);
+            color: white;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            text-decoration: none;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background-color: #d62f3c;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(230, 57, 70, 0.3);
+        }
+
+        .search-options {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .service-selection {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .service-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .service-option:hover {
+            background-color: #f5f5f5;
+        }
+
+        .service-option input {
+            margin: 0;
+        }
+
+        .passengers {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .passenger-count {
+            width: 4rem;
+            padding: 0.5rem;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid var(--accent-color);
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .results-container {
+            display: none;
+            margin-top: 2rem;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .results-filters {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            background-color: #f0f0f0;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .results-tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .tab {
+            padding: 1rem 2rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            background-color: #f5f5f5;
+        }
+
+        .tab.active {
+            border-bottom-color: var(--primary-color);
+        }
+
+        .tab-ctm.active {
+            border-bottom-color: var(--ctm-color);
+        }
+
+        .tab-oncf.active {
+            border-bottom-color: var(--oncf-color);
+        }
+
+        .journey-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .journey-card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: all 0.3s;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+        }
+
+        .journey-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .journey-service {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            width: 80px;
+        }
+
+        .journey-service.ctm {
+            background-color: var(--ctm-color);
+        }
+
+        .journey-service.oncf {
+            background-color: var(--oncf-color);
+        }
+
+        .journey-details {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .journey-times {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .time {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .duration {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .duration i {
+            color: var(--accent-color);
+        }
+
+        .journey-stations {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .station {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .journey-price {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #f9f9f9;
+            gap: 0.5rem;
+            width: 120px;
+        }
+
+        .price {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+
+        .select-btn {
+            padding: 0.6rem 1.2rem;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .select-btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: #888;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #888;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            opacity: 0.3;
+        }
+
+        @media (max-width: 768px) {
+            .search-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .journey-card {
+                grid-template-columns: 1fr;
+            }
+            
+            .journey-service {
+                width: 100%;
+                padding: 0.5rem;
+            }
+            
+            .journey-price {
+                width: 100%;
+            }
+            
+            .search-options {
+                flex-direction: column;
+            }
+        }
+
+        /* Animation classes */
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Destination swap button */
+        .swap-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, 10%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+
+        .swap-btn:hover {
+            transform: translate(-50%, 10%) rotate(180deg);
+            background-color: var(--secondary-color);
+        }
+
+        .promo-banner {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .promo-text {
+            font-weight: bold;
+        }
+
+        .dismiss-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .dismiss-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Date selection styling */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            opacity: 0.6;
+            transition: all 0.2s;
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator:hover {
+            opacity: 1;
+        }
+
+        /* Features section */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .feature-card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+        }
+
+        .feature-text {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            padding: 0 2rem;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-links a {
+            color: var(--light-color);
+            text-decoration: none;
+            opacity: 0.8;
+            transition: all 0.2s;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+            padding-left: 5px;
+        }
+
+        .copyright {
+            text-align: center;
+            padding: 1rem 0 0;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <header class="header">
+        <div class="header-content">
+            <h1 class="logo">MTRK : Morocco Travel Planner</h1>
+            <p class="tagline">Your journey, your way. Discover the best buses and trains across Morocco, tailored to your time and budget. Travel smarter with MTRK.</p>
+            <div class="service-badges">
+                <div class="service-badge badge-ctm">
+                    <i class="fas fa-bus"></i> CTM
+                </div>
+                <div class="service-badge badge-oncf">
+                    <i class="fas fa-train"></i> ONCF
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="promo-banner">
+            <span class="promo-text">🎁 Special offer: 10% discount on all CTM tickets booked today!</span>
+            <button class="dismiss-btn" id="dismissPromo">×</button>
+        </div>
+
+        <div class="search-card">
+            <form id="searchForm" class="search-form">
+                <div class="form-group autocomplete-container">
+                    <label for="departureLocation">From</label>
+                    <input type="text" id="departureLocation" class="form-control" placeholder="City or station" autocomplete="off">
+                    <i class="fas fa-map-marker-alt input-icon"></i>
+                    <div class="autocomplete-results" id="departureResults"></div>
+                </div>
+
+                <div class="form-group autocomplete-container">
+                    <label for="arrivalLocation">To</label>
+                    <input type="text" id="arrivalLocation" class="form-control" placeholder="City or station" autocomplete="off">
+                    <i class="fas fa-map-marker-alt input-icon"></i>
+                    <div class="autocomplete-results" id="arrivalResults"></div>
+                </div>
+
+                <div class="swap-btn" id="swapLocations">
+                    <i class="fas fa-exchange-alt"></i>
+                </div>
+
+                <div class="form-group">
+                    <label for="departureDate">Date</label>
+                    <input type="date" id="departureDate" class="form-control">
+                    <i class="fas fa-calendar input-icon"></i>
+                </div>
+
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button type="submit" class="btn" id="searchButton">
+                        <i class="fas fa-search"></i> Search Journey
+                    </button>
+                </div>
+            </form>
+
+            <div class="search-options">
+                <div class="service-selection">
+                    <label for="serviceType">Travel by:</label>
+                    <label class="service-option">
+                        <input type="radio" name="serviceType" value="all" checked> 
+                        <span>All services</span>
+                    </label>
+                    <label class="service-option">
+                        <input type="radio" name="serviceType" value="ctm"> 
+                        <span>CTM Bus only</span>
+                    </label>
+                    <label class="service-option">
+                        <input type="radio" name="serviceType" value="oncf"> 
+                        <span>ONCF Train only</span>
+                    </label>
+                </div>
+
+                <div class="passengers">
+                    <label for="numberOfAdults">Passengers:</label>
+                    <input type="number" id="numberOfAdults" class="passenger-count" min="1" max="9" value="1">
+                </div>
+            </div>
+        </div>
+
+        <div class="results-container" id="resultsContainer">
+            <div class="results-header">
+                <h2>Journey Results</h2>
+                <div class="results-filters">
+                    <button class="filter-btn active" data-filter="earliest">Earliest</button>
+                    <button class="filter-btn" data-filter="cheapest">Cheapest</button>
+                    <button class="filter-btn" data-filter="fastest">Fastest</button>
+                </div>
+            </div>
+
+            <div class="results-tabs">
+                <div class="tab tab-all active" data-tab="all">All Services</div>
+                <div class="tab tab-ctm" data-tab="ctm">CTM Bus</div>
+                <div class="tab tab-oncf" data-tab="oncf">ONCF Train</div>
+            </div>
+
+            <div class="journey-list" id="journeyList">
+                <!-- Journey results will be populated here -->
+                <div class="empty-state">
+                    <i class="fas fa-search"></i>
+                    <p>Enter your journey details to find available buses and trains</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3 class="feature-title">Unified Search</h3>
+                <p class="feature-text">Search both CTM buses and ONCF trains at once to find the best travel option across Morocco.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3 class="feature-title">Real-time Schedule</h3>
+                <p class="feature-text">Get up-to-date journey information with accurate departure and arrival times.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-map-marked-alt"></i>
+                </div>
+                <h3 class="feature-title">Extensive Coverage</h3>
+                <p class="feature-text">Connect to destinations across Morocco with our comprehensive transport network.</p>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>About Us</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Our Story</a></li>
+                    <li><a href="#">How It Works</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Press</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Help</h3>
+                <ul class="footer-links">
+                    <li><a href="#">FAQs</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">Support</a></li>
+                    <li><a href="#">Cancellation Policy</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Services</h3>
+                <ul class="footer-links">
+                    <li><a href="#">CTM Bus</a></li>
+                    <li><a href="#">ONCF Train</a></li>
+                    <li><a href="#">Package Deals</a></li>
+                    <li><a href="#">Group Bookings</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Legal</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Terms & Conditions</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Cookie Policy</a></li>
+                    <li><a href="#">Legal Notices</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="copyright">
+            © 2025 Morocco Travel Planner. All rights reserved.
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set default date to tomorrow
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            const formattedDate = tomorrow.toISOString().split('T')[0];
+            const departureDateEl = document.getElementById('departureDate');
+            departureDateEl.value = formattedDate;
+            departureDateEl.min = formattedDate;
+    
+            // Hide promo banner when dismiss button is clicked
+            document.getElementById('dismissPromo').addEventListener('click', function() {
+                document.querySelector('.promo-banner').style.display = 'none';
+            });
+    
+            // Location swap button
+            document.getElementById('swapLocations').addEventListener('click', function() {
+                const departureInput = document.getElementById('departureLocation');
+                const arrivalInput = document.getElementById('arrivalLocation');
+                const tempValue = departureInput.value;
+                departureInput.value = arrivalInput.value;
+                arrivalInput.value = tempValue;
+            });
+            
+            // Initialize autocomplete for both inputs
+            setupAutocomplete('departureLocation', 'departureResults');
+            setupAutocomplete('arrivalLocation', 'arrivalResults');
+    
+            // Form submission handling
+            document.getElementById('searchForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const loadingOverlay = document.querySelector('.loading-overlay');
+                const resultsContainer = document.getElementById('resultsContainer');
+                const journeyList = document.getElementById('journeyList');
+    
+                loadingOverlay.style.display = 'flex';
+                journeyList.innerHTML = '';
+    
+                const formData = {
+                    departureLocation: document.getElementById('departureLocation').value,
+                    arrivalLocation: document.getElementById('arrivalLocation').value,
+                    departureDate: document.getElementById('departureDate').value,
+                    numberOfAdults: document.getElementById('numberOfAdults').value,
+                    serviceType: document.querySelector('input[name="serviceType"]:checked').value
+                };
+    
+                fetch('/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    loadingOverlay.style.display = 'none';
+                    resultsContainer.style.display = 'block';
+    
+                    if (data.success) {
+                        displayResults(data);
+                    } else {
+                        journeyList.innerHTML = `
+                            <div class="no-results">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <p>Error: ${data.error}</p>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    loadingOverlay.style.display = 'none';
+                    console.error('Error:', error);
+                });
+            });
+    
+            // Initialize date picker constraints (redundant with above, can be removed if not needed)
+            departureDateEl.setAttribute('min', today.toISOString().split('T')[0]);
+        });
+    
+        // Autocomplete for departure and arrival locations
+        function setupAutocomplete(inputId, resultsId) {
+            const input = document.getElementById(inputId);
+            const results = document.getElementById(resultsId);
+            let timeoutId;
+    
+            input.addEventListener('input', function() {
+                clearTimeout(timeoutId);
+                
+                if (input.value.length < 2) {
+                    results.style.display = 'none';
+                    return;
+                }
+    
+                timeoutId = setTimeout(() => {
+                    fetchLocations(input.value, results, input);
+                }, 300);
+            });
+    
+            input.addEventListener('focus', function() {
+                if (input.value.length >= 2) {
+                    fetchLocations(input.value, results, input);
+                }
+            });
+    
+            // Close autocomplete results when clicking outside
+            document.addEventListener('click', function(e) {
+                if (e.target !== input && !results.contains(e.target)) {
+                    results.style.display = 'none';
+                }
+            });
+        }
+    
+        function fetchLocations(query, resultsElement, input) {
+            fetch(`/get_locations?query=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        displayAutocompleteResults(data, resultsElement, input);
+                    } else {
+                        resultsElement.innerHTML = '<div class="autocomplete-item">No locations found</div>';
+                        resultsElement.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching locations:', error);
+                });
+        }
+    
+        function displayAutocompleteResults(locations, resultsElement, input) {
+            resultsElement.innerHTML = '';
+            
+            locations.forEach(location => {
+                const item = document.createElement('div');
+                item.className = 'autocomplete-item';
+                
+                let serviceHTML = '';
+                if (location.services.includes('CTM') && location.services.includes('ONCF')) {
+                    serviceHTML = '<span class="service-tag ctm">CTM</span><span class="service-tag oncf">ONCF</span>';
+                } else if (location.services.includes('CTM')) {
+                    serviceHTML = '<span class="service-tag ctm">CTM</span>';
+                } else if (location.services.includes('ONCF')) {
+                    serviceHTML = '<span class="service-tag oncf">ONCF</span>';
+                }
+    
+                item.innerHTML = `
+                    <span>${location.name}</span>
+                    <div style="margin-left: auto">${serviceHTML}</div>
+                `;
+                
+                item.addEventListener('click', function() {
+                    input.value = location.name;
+                    resultsElement.style.display = 'none';
+                });
+                
+                resultsElement.appendChild(item);
+            });
+            
+            resultsElement.style.display = 'block';
+        }
+    
+        function displayResults(data) {
+            const journeyList = document.getElementById('journeyList');
+            journeyList.innerHTML = '';
+    
+            // Combine and sort all journeys
+            const allJourneys = [
+                ...data.ctm_journeys.map(j => ({...j, type: 'ctm'})),
+                ...data.oncf_journeys.map(j => ({...j, type: 'oncf'}))
+            ];
+    
+            if (allJourneys.length === 0) {
+                journeyList.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-train"></i>
+                        <i class="fas fa-bus"></i>
+                        <p>No journeys found for your search criteria</p>
+                    </div>
+                `;
+                return;
+            }
+    
+            allJourneys.forEach(journey => {
+                const journeyCard = document.createElement('div');
+                journeyCard.className = 'journey-card fade-in';
+                journeyCard.innerHTML = `
+                    <div class="journey-service ${journey.type}">
+                        ${journey.type === 'ctm' ? '<i class="fas fa-bus"></i>' : '<i class="fas fa-train"></i>'}
+                        ${journey.type.toUpperCase()}
+                    </div>
+                    <div class="journey-details">
+                        <div class="journey-times">
+                            <span class="time">${journey["Departure Time"]}</span>
+                            <span class="duration">${journey.Duration}</span>
+                            <span class="time">${journey["Arrival Time"]}</span>
+                        </div>
+                        <div class="journey-stations">
+                            <span class="station">${journey["Departure Station"]}</span>
+                            <span class="station">${journey["Arrival Station"]}</span>
+                        </div>
+                    </div>
+                    <div class="journey-price">
+                        <span class="price">${journey.Price}</span>
+                        <button class="select-btn">Select</button>
+                    </div>
+                `;
+                journeyList.appendChild(journeyCard);
+            });
+        }
+    
+        // Results filtering (if needed)
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+
+        const filterType = this.getAttribute('data-filter');
+        sortJourneys(filterType);
+    });
+});
+
+function sortJourneys(criteria) {
+    const journeyList = document.getElementById('journeyList');
+    let journeys = Array.from(journeyList.children);
+
+    journeys.sort((a, b) => {
+        const timeA = a.querySelector('.time').innerText.trim();
+        const timeB = b.querySelector('.time').innerText.trim();
+        const priceA = parseFloat(a.querySelector('.price').innerText.replace(/[^\d.]/g, ''));
+        const priceB = parseFloat(b.querySelector('.price').innerText.replace(/[^\d.]/g, ''));
+        const durationA = a.querySelector('.duration').innerText.trim();
+        const durationB = b.querySelector('.duration').innerText.trim();
+
+        const convertTime = (time) => {
+            const [hours, minutes] = time.split(':').map(Number);
+            return hours * 60 + minutes;
+        };
+
+        const convertDuration = (duration) => {
+            const parts = duration.match(/(\d+)h\s*(\d*)min?/);
+            return parts ? parseInt(parts[1]) * 60 + (parts[2] ? parseInt(parts[2]) : 0) : 0;
+        };
+
+        if (criteria === 'earliest') {
+            return convertTime(timeA) - convertTime(timeB);
+        } else if (criteria === 'cheapest') {
+            return priceA - priceB;
+        } else if (criteria === 'fastest') {
+            return convertDuration(durationA) - convertDuration(durationB);
+        }
+    });
+
+    journeyList.innerHTML = '';
+    journeys.forEach(journey => journeyList.appendChild(journey));
+}
+
+    
+        // Tab navigation
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                const tabType = this.dataset.tab;
+                
+                document.querySelectorAll('.journey-card').forEach(card => {
+                    card.style.display = tabType === 'all' ? 'grid' : 
+                        card.querySelector('.journey-service').classList.contains(tabType) ? 'grid' : 'none';
+                });
+            });
+        });
+    </script>
+    
+</body>
+</html>

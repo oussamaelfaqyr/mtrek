@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTM Bus Journey Search</title>
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --secondary-color: #f8f9fa;
+            --accent-color: #e74c3c;
+            --text-color: #333;
+            --border-color: #ddd;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        .search-form {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.1);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: block;
+            width: 100%;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background-color: #004494;
+        }
+
+        .results {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .results h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--secondary-color);
+        }
+
+        .journey-card {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .journey-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .journey-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .journey-time {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .journey-price {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        .journey-details {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .journey-station {
+            font-size: 0.95rem;
+            color: #666;
+        }
+
+        .journey-duration {
+            text-align: center;
+            background-color: var(--secondary-color);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .autocomplete-container {
+            position: relative;
+        }
+
+        .autocomplete-list {
+            position: absolute;
+            z-index: 100;
+            width: 100%;
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .autocomplete-item {
+            padding: 10px 12px;
+            cursor: pointer;
+        }
+
+        .autocomplete-item:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .error-message {
+            color: var(--accent-color);
+            margin-top: 5px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+            display: none;
+        }
+
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .journey-header, .journey-details {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .journey-price, .journey-time {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Recherche de Voyages en Bus</h1>
+            <p>Trouvez les meilleurs trajets entre villes marocaines</p>
+        </header>
+
+        <div class="search-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="departure-city">Ville de départ</label>
+                    <div class="autocomplete-container">
+                        <input type="text" id="departure-city" placeholder="Ex: Casablanca" autocomplete="off">
+                        <div class="autocomplete-list" id="departure-city-list"></div>
+                        <div class="error-message" id="departure-city-error">Veuillez sélectionner une ville valide</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="arrival-city">Ville d'arrivée</label>
+                    <div class="autocomplete-container">
+                        <input type="text" id="arrival-city" placeholder="Ex: Fes" autocomplete="off">
+                        <div class="autocomplete-list" id="arrival-city-list"></div>
+                        <div class="error-message" id="arrival-city-error">Veuillez sélectionner une ville valide</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="departure-date">Date de départ</label>
+                    <input type="date" id="departure-date" min="">
+                    <div class="error-message" id="date-error">Veuillez sélectionner une date valide</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="adults">Nombre d'adultes</label>
+                    <input type="number" id="adults" min="1" max="9" value="1">
+                    <div class="error-message" id="adults-error">Veuillez entrer un nombre valide d'adultes (1-9)</div>
+                </div>
+            </div>
+
+            <button id="search-button">Rechercher</button>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Recherche des trajets disponibles...</p>
+        </div>
+
+        <div class="results" id="results">
+            <h2>Trajets disponibles</h2>
+            <div id="journeys-container">
+                <!-- Journey cards will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set minimum date to today
+            const today = new Date();
+            const formattedDate = today.toISOString().split('T')[0];
+            document.getElementById('departure-date').min = formattedDate;
+            document.getElementById('departure-date').value = formattedDate;
+
+            const departureCity = document.getElementById('departure-city');
+            const arrivalCity = document.getElementById('arrival-city');
+            const departureCityList = document.getElementById('departure-city-list');
+            const arrivalCityList = document.getElementById('arrival-city-list');
+            const searchButton = document.getElementById('search-button');
+            const resultsContainer = document.getElementById('results');
+            const loadingContainer = document.getElementById('loading');
+            const journeysContainer = document.getElementById('journeys-container');
+
+            let departureCityId = null;
+            let arrivalCityId = null;
+
+            // Autocomplete for departure city
+            departureCity.addEventListener('input', function() {
+                const query = this.value.trim();
+                if (query.length < 2) {
+                    departureCityList.style.display = 'none';
+                    return;
+                }
+                
+                fetch(`/get_cities?query=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        departureCityList.innerHTML = '';
+                        
+                        data.forEach(city => {
+                            const item = document.createElement('div');
+                            item.className = 'autocomplete-item';
+                            item.textContent = city.name;
+                            item.addEventListener('click', function() {
+                                departureCity.value = city.name;
+                                departureCityId = city.id;
+                                document.getElementById('departure-city-error').style.display = 'none';
+                                departureCityList.style.display = 'none';
+                            });
+                            departureCityList.appendChild(item);
+                        });
+                        
+                        departureCityList.style.display = data.length > 0 ? 'block' : 'none';
+                    });
+            });
+
+            // Autocomplete for arrival city
+            arrivalCity.addEventListener('input', function() {
+                const query = this.value.trim();
+                if (query.length < 2) {
+                    arrivalCityList.style.display = 'none';
+                    return;
+                }
+                
+                fetch(`/get_cities?query=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        arrivalCityList.innerHTML = '';
+                        
+                        data.forEach(city => {
+                            const item = document.createElement('div');
+                            item.className = 'autocomplete-item';
+                            item.textContent = city.name;
+                            item.addEventListener('click', function() {
+                                arrivalCity.value = city.name;
+                                arrivalCityId = city.id;
+                                document.getElementById('arrival-city-error').style.display = 'none';
+                                arrivalCityList.style.display = 'none';
+                            });
+                            arrivalCityList.appendChild(item);
+                        });
+                        
+                        arrivalCityList.style.display = data.length > 0 ? 'block' : 'none';
+                    });
+            });
+
+            // Hide autocomplete lists when clicking outside
+            document.addEventListener('click', function(e) {
+                if (e.target !== departureCity) {
+                    departureCityList.style.display = 'none';
+                }
+                if (e.target !== arrivalCity) {
+                    arrivalCityList.style.display = 'none';
+                }
+            });
+
+            // Search button click event
+            searchButton.addEventListener('click', function() {
+                // Form validation
+                let isValid = true;
+                
+                if (!departureCityId) {
+                    document.getElementById('departure-city-error').style.display = 'block';
+                    isValid = false;
+                }
+                
+                if (!arrivalCityId) {
+                    document.getElementById('arrival-city-error').style.display = 'block';
+                    isValid = false;
+                }
+                
+                const departureDate = document.getElementById('departure-date').value;
+                if (!departureDate) {
+                    document.getElementById('date-error').style.display = 'block';
+                    isValid = false;
+                }
+                
+                const adults = document.getElementById('adults').value;
+                if (!adults || adults < 1 || adults > 9) {
+                    document.getElementById('adults-error').style.display = 'block';
+                    isValid = false;
+                }
+                
+                if (!isValid) return;
+                
+                // Show loading, hide results
+                loadingContainer.style.display = 'block';
+                resultsContainer.style.display = 'none';
+                
+                // Call the API to search for journeys
+                fetch('/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        departureCityId: departureCityId,
+                        arrivalCityId: arrivalCityId,
+                        departureDate: departureDate,
+                        numberOfAdults: adults
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displayJourneys(data.journeys);
+                    } else {
+                        console.error('Error:', data.error);
+                        journeysContainer.innerHTML = '<p class="no-results">Une erreur s\'est produite. Veuillez réessayer.</p>';
+                    }
+                    
+                    // Hide loading, show results
+                    loadingContainer.style.display = 'none';
+                    resultsContainer.style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    journeysContainer.innerHTML = '<p class="no-results">Une erreur s\'est produite. Veuillez réessayer.</p>';
+                    
+                    // Hide loading, show results
+                    loadingContainer.style.display = 'none';
+                    resultsContainer.style.display = 'block';
+                });
+            });
+
+            function displayJourneys(journeys) {
+                journeysContainer.innerHTML = '';
+                
+                if (journeys.length === 0) {
+                    journeysContainer.innerHTML = '<p class="no-results">Aucun trajet disponible pour cette recherche.</p>';
+                    return;
+                }
+                
+                journeys.forEach(journey => {
+                    const journeyCard = document.createElement('div');
+                    journeyCard.className = 'journey-card';
+                    
+                    journeyCard.innerHTML = `
+                        <div class="journey-header">
+                            <div class="journey-time">${journey['Departure Time']} → ${journey['Arrival Time']}</div>
+                            <div class="journey-price">${journey['Price']}</div>
+                        </div>
+                        <div class="journey-details">
+                            <div class="journey-station">${journey['Departure Station']}</div>
+                            <div class="journey-duration">${journey['Duration']}</div>
+                            <div class="journey-station">${journey['Arrival Station']}</div>
+                        </div>
+                    `;
+                    
+                    journeysContainer.appendChild(journeyCard);
+                });
+            }
+
+            // Pre-fill with example values
+            departureCity.value = 'Casablanca';
+            arrivalCity.value = 'Fes';
+            
+            // Simulate selecting from autocomplete
+            setTimeout(() => {
+                fetch('/get_cities?query=casablanca')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.length > 0) {
+                            departureCityId = data[0].id;
+                        }
+                    });
+                
+                fetch('/get_cities?query=fes')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.length > 0) {
+                            arrivalCityId = data[0].id;
+                        }
+                    });
+            }, 500);
+        });
+    </script>
+</body>
+</html>

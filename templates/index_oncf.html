@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recherche de Trajets ONCF</title>
+    <style>
+        :root {
+            --primary-color: #A60303;
+            --secondary-color: #F5F1E9;
+            --accent-color: #870202;
+            --text-color: #333;
+            --border-color: #ddd;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            text-align: center;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: var(--primary-color);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: var(--accent-color);
+        }
+
+        .loading {
+            display: none;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-top: 15px;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Recherche de Trajets ONCF</h1>
+        <div class="form-group">
+            <label for="departure-station">Gare de départ</label>
+            <input type="text" id="departure-station" list="stations-list" placeholder="Ex: Rabat Ville">
+        </div>
+
+        <div class="form-group">
+            <label for="arrival-station">Gare d'arrivée</label>
+            <input type="text" id="arrival-station" list="stations-list" placeholder="Ex: Marrakech">
+        </div>
+
+        <div class="form-group">
+            <label for="departure-date">Date de départ</label>
+            <input type="date" id="departure-date">
+        </div>
+
+        <button id="search-button">Rechercher</button>
+        <p class="loading" id="loading">Recherche en cours...</p>
+
+        <table id="results-table" style="display:none;">
+            <thead>
+                <tr>
+                    <th>Départ</th>
+                    <th>Arrivée</th>
+                    <th>Services</th>
+                    <th>Gamme</th>
+                    <th>Réservation</th>
+                </tr>
+            </thead>
+            <tbody id="results-body"></tbody>
+        </table>
+    </div>
+
+    <datalist id="stations-list"></datalist>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Charger les gares dans le datalist
+            fetch("/stations")
+                .then(response => response.json())
+                .then(stations => {
+                    let datalist = document.getElementById("stations-list");
+                    datalist.innerHTML = "";
+                    stations.forEach(station => {
+                        let option = document.createElement("option");
+                        option.value = station;
+                        datalist.appendChild(option);
+                    });
+                })
+                .catch(error => console.error("Erreur chargement des gares :", error));
+
+            // Gestion du clic sur le bouton de recherche
+            document.getElementById("search-button").addEventListener("click", function () {
+                let depart = document.getElementById("departure-station").value;
+                let arrivee = document.getElementById("arrival-station").value;
+                let date = document.getElementById("departure-date").value;
+                
+                if (!depart || !arrivee || !date) {
+                    alert("Veuillez remplir tous les champs !");
+                    return;
+                }
+
+                let requestData = { depart, arrivee, date };
+                let loading = document.getElementById("loading");
+                let resultsTable = document.getElementById("results-table");
+                let resultsBody = document.getElementById("results-body");
+
+                loading.style.display = "block";
+                resultsTable.style.display = "none";
+                resultsBody.innerHTML = "";
+
+                fetch("/search", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(requestData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    loading.style.display = "none";
+
+                    if (data.length === 0) {
+                        alert("Aucun train trouvé !");
+                        return;
+                    }
+
+                    resultsTable.style.display = "table";
+                    data.forEach(train => {
+                        let row = `<tr>
+                            <td>${train.Départ}</td>
+                            <td>${train.Arrivée}</td>
+                            <td>${train.Services.join(", ")}</td>
+                            <td>${train.Gamme}</td>
+                            <td><a href="${train["Lien d'achat"]}" target="_blank">Réserver</a></td>
+                        </tr>`;
+                        resultsBody.innerHTML += row;
+                    });
+                })
+                .catch(error => {
+                    loading.style.display = "none";
+                    alert("Erreur lors de la recherche !");
+                    console.error(error);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
