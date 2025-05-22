@@ -398,7 +398,3 @@ def get_locations():
     
     filtered_locations = [location for location in all_locations if query in location['name'].lower()]
     return jsonify(filtered_locations[:10])  # Limiter à 10 résultats
-
-if __name__ == '__main__':
-    # Lancer l'application Flask pour qu'elle soit accessible sur tout le réseau
-    app.run(debug=True, host='0.0.0.0', port=5000)
